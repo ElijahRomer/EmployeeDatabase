@@ -1,3 +1,4 @@
+USE employee_db;
 -- VIEW ALL DEPARTMENTS**************
 -- FORMATTED TABLE SHOWING DEPARTMENT NAMES AND DEPARTMENT IDs
 SELECT
@@ -13,8 +14,8 @@ SELECT
   department.name AS Department,
   salary AS "Annual Salary USD"
 FROM
-  department
-  LEFT JOIN role ON role.department_id = department.id
+  role
+  LEFT JOIN department ON role.department_id = department.id
 ORDER BY
   role.id;
 -- VIEW ALL EMPLOYEES **************
