@@ -11,7 +11,7 @@ class dbInteraction {
         if (error) {
           return reject(error);
         }
-        return resolve(rows);
+        resolve(rows);
       })
     })
   }

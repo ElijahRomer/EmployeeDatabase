@@ -6,6 +6,8 @@ SELECT
   name AS 'Department Name'
 FROM
   department;
+  
+  SELECT id, name FROM department;
 -- VIEW ALL ROLES**************
   -- FORMATTED TABLE SHOWING JOB TITLES, ROLE ID, DEPARTMENT THE ROLE BELONGS TO, AND SALARY FOR THAT ROLE
 SELECT
@@ -18,6 +20,8 @@ FROM
   LEFT JOIN department ON role.department_id = department.id
 ORDER BY
   role.id;
+  
+  
 -- VIEW ALL EMPLOYEES **************
   -- FORMATTED TABLE SHOWING EMPLOYEE IDs, FIRST NAMES, LAST NAMES, JOB TITLES, DEPARTMENTS, SALARIES, AND MANAGERS THEY REPORT TO
 SELECT
@@ -157,3 +161,6 @@ FROM
   LEFT JOIN role ON department.id = role.department_id
 WHERE
   department.id = 1;
+  
+  SELECT * FROM role;
+  SELECT * FROM employee;
