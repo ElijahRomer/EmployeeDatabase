@@ -1,6 +1,6 @@
 const mysql = require(`mysql2`);
 
-class dbInteraction {
+class dbPromisify {
   constructor( config ) {
     this.connection = mysql.createConnection( config );
   }
@@ -29,4 +29,4 @@ class dbInteraction {
   }
 };
 
-module.exports = dbInteraction;
+module.exports = dbPromisify;

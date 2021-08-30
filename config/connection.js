@@ -1,4 +1,4 @@
-const dbInteraction = require("../dbInteraction/dbInteract");
+const dbPromisify = require("../dbInteraction/dbPromisify");
 const config = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -7,6 +7,6 @@ const config = {
 }
 
 
-const connection = new dbInteraction(config)
+const connection = new dbPromisify(config)
 
 module.exports = connection;
