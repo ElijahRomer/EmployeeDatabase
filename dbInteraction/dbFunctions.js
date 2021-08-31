@@ -6,6 +6,9 @@ const dbPromisify = require("./dbPromisify");
 
 //apparently need to use mysql2 rather than mysql-native
 
+//***********EVERYWHERE THERE IS AN ID PARAMETER, ADD IN AN ID QUERY SO YOU CAN CHANGE IT TO THE NAME, FOR HUMAN READABILITY PURPOSES. */
+
+
 //FUNCTIONS
 let dbFunctions = {
   capitalizeFirstLetter: (string) => {
@@ -134,13 +137,17 @@ let dbFunctions = {
     }
   },
 
-  updateEmployeeRole: async (roleId, employeeId) => {
+  updateEmployeeRole: async (newRole, employeeId) => {
+    //(possibly add an additional query to allow for user to select name of role)
+    
+    let newRoleIdQuery = await database.query(`SELECT id FROM role WHERE title = ?;`, [newRole]);
+    let newRoleId = newRoleIdQuery[0].id;
     let sql = `
     UPDATE employee
     SET role_id = ?
     WHERE id = ?;`;
     try {
-      let result = await database.query(sql, [roleId, employeeId]);
+      let result = await database.query(sql, [newRoleId, employeeId]);
       console.log(`\n\n Employee role update successful. ${result.affectedRows} row(s) affected.\n\n`);
       
     } catch (error) {
