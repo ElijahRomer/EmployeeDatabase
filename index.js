@@ -85,26 +85,6 @@ let nextActionQuestions = [{
   ]
 }];
 
-let exitDatabase = () => {
-  console.log(`\n\nGoodbye!\n\n`)
-  database.close();
-}
-
-let nextActionPrompt = async (previousAnswer) => {
-  let nextAction = await inquirer.prompt(nextActionQuestions);
-  switch (nextAction.nextAction) {
-    case `Run a different query or command`:
-      init();
-      break;
-    case `Repeat same query`:
-      console.log(previousAnswer);
-      repeatActionPrompt(previousAnswer)
-      break;
-    case `Exit Employee database`:
-      exitDatabase();
-  }
-}
-
 let answerSwitch = async (answer) => {
   switch (answer) {
     case 'View all company departments':
@@ -151,117 +131,44 @@ let answerSwitch = async (answer) => {
       break;
     case "Exit employee database":
       exitDatabase();
-      return;
+      return "exit";
   }
 }
+
+let exitDatabase = () => {
+  console.log(`\n\nGoodbye!\n\n`)
+  database.close();
+}
+
+let nextActionPrompt = async (previousAnswer) => {
+  let nextAction = await inquirer.prompt(nextActionQuestions);
+  switch (nextAction.nextAction) {
+    case `Run a different query or command`:
+      init();
+      break;
+    case `Repeat same query`:
+      console.log(previousAnswer);
+      await answerSwitch(previousAnswer);
+      await nextActionPrompt(previousAnswer);
+      break;
+    case `Exit Employee database`:
+      exitDatabase();
+      return;
+  }
+};
 
 let init = () => {
   inquirer.prompt(questions)
     .then(async (answer) => {
-      console.log(answer.selectAction);
       let previousAnswer = answer.selectAction;
-      switch (answer.selectAction) {
-        case 'View all company departments':
-          await viewAllDepartments();
-          break;
-        case 'View all company roles':
-          await viewAllRoles();
-          break;
-        case 'View all company employees':
-          await viewAllEmployees();
-          break;
-        case 'View employees under a specific manager':
-          await viewEmployeesByManager();
-          break;
-        case 'View employees in a specific department':
-          await viewEmployeesByDepartment();
-          break;
-        case 'View all department salary budgets':
-          await viewDepartmentBudgets();
-          break;
-        case 'Add a new company department':
-          await addNewDepartment();
-          break;
-        case 'Add a new company role':
-          await addNewRole();
-          break;
-        case 'Add a new company employee':
-          await addNewEmployee();
-          break;
-        case "Update an employee's role":
-          await updateEmployeeRole();
-          break;
-        case "Update an employee's manager":
-          await updateEmployeeManager();
-          break;
-        case "Delete a company department":
-          await deleteDepartment();
-          break;
-        case "Delete a company role":
-          await deleteRole();
-          break;
-        case "Delete a company employee":
-          await deleteEmployee();
-          break;
-        case "Exit employee database":
-          exitDatabase();
-          return;
+      let exit = await answerSwitch(previousAnswer);
+      if (exit) {
+        return;
       }
-      nextActionPrompt(previousAnswer);
+      await nextActionPrompt(previousAnswer);
     })
 }
 
-let repeatActionPrompt = async (previousAnswer) => {
-  // console.log(previousAnswer);
-  switch (previousAnswer) {
-    case 'View all company departments':
-      await viewAllDepartments();
-      break;
-    case 'View all company roles':
-      await viewAllRoles();
-      break;
-    case 'View all company employees':
-      await viewAllEmployees();
-      break;
-    case 'View employees under a specific manager':
-      await viewEmployeesByManager();
-      break;
-    case 'View employees in a specific department':
-      await viewEmployeesByDepartment();
-      break;
-    case 'View all department salary budgets':
-      await viewDepartmentBudgets();
-      break;
-    case 'Add a new company department':
-      await addNewDepartment();
-      break;
-    case 'Add a new company role':
-      await addNewRole();
-      break;
-    case 'Add a new company employee':
-      await addNewEmployee();
-      break;
-    case "Update an employee's role":
-      await updateEmployeeRole();
-      break;
-    case "Update an employee's manager":
-      await updateEmployeeManager();
-      break;
-    case "Delete a company department":
-      await deleteDepartment();
-      break;
-    case "Delete a company role":
-      await deleteRole();
-      break;
-    case "Delete a company employee":
-      await deleteEmployee();
-      break;
-    case "Exit employee database":
-      exitDatabase();
-      return;
-  }
-  nextActionPrompt(previousAnswer);
-}
 
 init();
 
