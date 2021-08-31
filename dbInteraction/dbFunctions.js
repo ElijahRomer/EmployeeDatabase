@@ -79,11 +79,11 @@ let dbFunctions = {
       let result = await database.query(sql)
       console.log(`\n\nAll Employees in database are as follows:\n\n`)
       console.table(result);
-      
+
 
     } catch (error) {
       console.error(error)
-      
+
     }
   },
 
@@ -93,11 +93,11 @@ let dbFunctions = {
       let result = await database.query(sql, [this.capitalizeFirstLetter(departmentName)]);
 
       console.log(`\n\nInsert new department "${this.capitalizeFirstLetter(departmentName)}" successful. ${result.affectedRows} row(s) affected.\n\n`)
-      
+
 
     } catch (error) {
-      console.error(`DEPARTMENT COULD NOT BE ADDED. SEE FOLLOWING ERROR REPORT: `. error);
-      
+      console.error(`DEPARTMENT COULD NOT BE ADDED. SEE FOLLOWING ERROR REPORT: `.error);
+
     }
   },
 
@@ -111,10 +111,10 @@ let dbFunctions = {
       let result = await database.query(sql, [title, salary, departmentId]);
 
       console.log(`\n\nInsert new role "${title}" successful. ${result.affectedRows} row(s) affected.\n\n`)
-      
+
     } catch (error) {
       console.error(`\n\nROLE COULD NOT BE ADDED. SEE FOLLOWING ERROR REPORT: \n\n`, error);
-      
+
     }
   },
 
@@ -125,9 +125,9 @@ let dbFunctions = {
     VALUE (?, ?, ?, ?);`;
     try {
       let result = await database.query(sql, [
-        this.capitalizeFirstLetter(firstName), 
-        this.capitalizeFirstLetter(lastName), 
-        roleId, 
+        this.capitalizeFirstLetter(firstName),
+        this.capitalizeFirstLetter(lastName),
+        roleId,
         managerId
       ]);
       console.log(`\n\nInsert new employee "${firstName} ${lastName}" successful. ${result.affectedRows} row(s) affected.\n\n`);
@@ -139,7 +139,7 @@ let dbFunctions = {
 
   updateEmployeeRole: async (newRole, employeeId) => {
     //(possibly add an additional query to allow for user to select name of role)
-    
+
     let newRoleIdQuery = await database.query(`SELECT id FROM role WHERE title = ?;`, [newRole]);
     let newRoleId = newRoleIdQuery[0].id;
     let sql = `
@@ -149,7 +149,7 @@ let dbFunctions = {
     try {
       let result = await database.query(sql, [newRoleId, employeeId]);
       console.log(`\n\n Employee role update successful. ${result.affectedRows} row(s) affected.\n\n`);
-      
+
     } catch (error) {
       console.error(`\n\nEMPLOYEE ROLE COULD NOT BE UPDATED. SEE FOLLOWING ERROR REPORT: \n\n`, error);
     }
@@ -165,7 +165,7 @@ let dbFunctions = {
       let result = await database.query(sql, [managerId, employeeId]);
 
       console.log(`\n\n Employee manager update successful. ${result.affectedRows} row(s) affected.\n\n`)
-      
+
     } catch (error) {
       console.error(`\n\nEMPLOYEE MANAGER COULD NOT BE UPDATED. SEE FOLLOWING ERROR REPORT: \n\n`, error)
     }
@@ -190,22 +190,22 @@ let dbFunctions = {
 
     try {
       let managerIdQuery = await database.query(`SELECT id FROM employee WHERE last_name = ?;`, [managerName]);
-        
+
       if (managerIdQuery.length < 1) {
-          console.log(`\n\n The specified manager does not exist. Please check your spelling or try a different manager. \n\n`);
-          return;
-        }
+        console.log(`\n\n The specified manager does not exist. Please check your spelling or try a different manager. \n\n`);
+        return;
+      }
 
       let managerId = managerIdQuery[0].id;
       let result = await database.query(sql, [managerId]);
-      if (result.length < 1){
+      if (result.length < 1) {
         console.log(`\n\nThe specified Manager does not have any direct reports.\n\n`);
         return;
       }
       console.log(`\n\nEmployees reporting to Manager "${managerName}" are as follows:\n\n`)
       console.table(result);
       return;
-      
+
     } catch (error) {
       console.error(`\n\nVIEW EMPLOYEES BY MANAGER WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
     }
@@ -215,13 +215,13 @@ let dbFunctions = {
     try {
       let departmentIdQuery = await database.query(`SELECT id FROM department WHERE name = ?;`, [departmentName]);
 
-        if (departmentIdQuery.length < 1) {
-          console.log(`\n\n The specified department does not exist. Please check your spelling or try a different department. \n\n`);
-          return;
-        }
+      if (departmentIdQuery.length < 1) {
+        console.log(`\n\n The specified department does not exist. Please check your spelling or try a different department. \n\n`);
+        return;
+      }
 
       let departmentId = departmentIdQuery[0].id;
-      
+
       let sql = `
       SELECT
         employee.first_name AS 'First Name',
@@ -242,10 +242,10 @@ let dbFunctions = {
         employee.last_name;`;
 
       let result = await database.query(sql, [departmentId]);
-        if (result.length < 1){
-          console.log(`\n\nThe specified department does not have any employees.\n\n`)
-          return;
-        }
+      if (result.length < 1) {
+        console.log(`\n\nThe specified department does not have any employees.\n\n`)
+        return;
+      }
       console.log(`\n\nEmployees in department "${departmentName}" are as follows:\n\n`)
       console.table(result);
 
@@ -271,7 +271,7 @@ let dbFunctions = {
 
     } catch (error) {
       console.error(`\n\nDELETE DEPARTMENT WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
-      
+
     }
   },
 
@@ -292,13 +292,13 @@ let dbFunctions = {
       console.log(`\n\nRole "${roleName}" was successfully deleted.\n\n`)
 
 
-    } catch (error){
+    } catch (error) {
       console.error(`\n\nDELETE ROLE WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
-      
+
     }
   },
 
- deleteEmployee: async (employeeId) => {
+  deleteEmployee: async (employeeId) => {
     try {
       let sql = `DELETE FROM employee WHERE id = ?;`;
       let result = await database.query(sql, [employeeId]);
@@ -309,13 +309,13 @@ let dbFunctions = {
       }
       console.log(`\n\nEmployee with ID: ${employeeId} was successfully deleted.\n\n`)
 
-    } catch (error){
+    } catch (error) {
       console.error(`\n\nDELETE EMPLOYEE WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
-      
+
     }
   },
 
- viewDepartmentBudgets: async () => {
+  viewDepartmentBudgets: async () => {
     try {
       let sql = `
       SELECT
@@ -326,14 +326,28 @@ let dbFunctions = {
         LEFT JOIN role ON department.id = role.department_id
       GROUP BY
         department.id;`;
-        let result = await database.query(sql);
-        console.log(`\n\nDepartment Budgets are as Follows: \n\n`)
-        console.table(result);
+      let result = await database.query(sql);
+      console.log(`\n\nDepartment Budgets are as Follows: \n\n`)
+      console.table(result);
     } catch (error) {
       console.error(`\n\nDEPARTMENT BUDGET QUERY WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
     }
-  }
-};
+  },
 
+  generateListOfManagers: async () => {
+    try {
+      let managerQuery = await database.query(`
+      SELECT 
+        last_name AS LastName
+      FROM employee 
+      WHERE role_id < 4;`);
+      // console.log(managerQuery);
+      return managerQuery;
+
+    } catch (error) {
+      console.error(`\n\nVIEW MANAGERS WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
+    }
+  },
+};
 
 module.exports = dbFunctions;
