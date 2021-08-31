@@ -121,7 +121,7 @@ let answerSwitch = async (answer) => {
       await viewAllEmployees();
       break;
 
-    case 'View employees under a specific manager': //
+    case 'View employees under a specific manager':
       await getManagerPrompt()
         .then(async (managerPrompt) => {
           let choice = await inquirer.prompt(managerPrompt);
@@ -130,7 +130,7 @@ let answerSwitch = async (answer) => {
         .then(choice => viewEmployeesByManager(choice));
       break;
 
-    case 'View employees in a specific department': //ADD PROMPT FOR DEPARTMENT
+    case 'View employees in a specific department':
       await getDepartmentPrompt()
         .then(async (departmentPrompt) => {
           let choice = await inquirer.prompt(departmentPrompt);
@@ -148,8 +148,46 @@ let answerSwitch = async (answer) => {
       break;
 
     case 'Add a new company department': //ADD PROMPT FOR DEPARTMENT name
-      await addNewDepartment();
+      await inquirer.prompt({
+        type: `input`,
+        name: `newDepartmentName`,
+        message: 'Please enter name of new department',
+      })
+        .then(async (input) => {
+          await addNewDepartment(input.newDepartmentName)
+        })
+        .then(async () => {
+          return await inquirer.prompt({
+            type: `list`,
+            name: `viewDepartments`,
+            message: `View departments?`,
+            choices: [
+              `Yes`,
+              `No`
+            ]
+          })
+        })
+        .then(async (response) => {
+          if (response.viewDepartments === `Yes`) {
+            await viewAllDepartments()
+          }
+          return;
+        })
       break;
+
+
+
+
+
+
+
+    //ABOVE THIS LINE, FUNCTIONS ARE DONE.
+
+
+
+
+
+
 
     case 'Add a new company role': //ADD PROMPT FOR ROLE title, salary, department_id
       await addNewRole();
