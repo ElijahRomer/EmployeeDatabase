@@ -34,7 +34,7 @@ const {
   deleteRole,
   deleteEmployee,
   viewDepartmentBudgets,
-  // getManagerPrompt,
+  queryDepartmentIdByName
 
 } = require(`./dbInteraction/dbFunctions`);
 
@@ -103,7 +103,7 @@ let nextActionQuestions = [{
   choices: [
     `Run a different query or command`,
     `Repeat same query`,
-    `Exit Employee database`
+    `Exit Company database`
   ]
 }];
 
@@ -175,22 +175,60 @@ let answerSwitch = async (answer) => {
         })
       break;
 
+    case 'Add a new company role':
+      //default prompts for this query line
+      let prompts = [
+        {
+          type: `input`,
+          name: `newRoleTitle`,
+          message: 'Please enter name of new role',
+        },
+        {
+          type: `input`,
+          name: `newRoleSalary`,
+          message: 'Please enter annual salary in USD for new role. Please include only numeric characters.',
+          validate: async (input) => {
+            return new Promise((resolve, reject) => {
+              let parsedInt = parseInt(input)
+              if (Number.isNaN(parsedInt)) {
+                reject('Please enter a valid number.');
+              }
+              resolve(true);
+            })
+          }
+        },
+      ];
 
+      //generate dynamic department prompt
+      let departmentPrompt = await getDepartmentPrompt()
+      prompts.push(departmentPrompt);
 
+      //begin inquirer prompt sequence
+      await inquirer.prompt(prompts)
+        .then(async (input) => {
+          let newRoleTitle = input.newRoleTitle
+          let newRoleSalary = parseInt(input.newRoleSalary)
+          let newRoleDepartmentid = await queryDepartmentIdByName(input.departmentSelection);
 
-
-
-
-    //ABOVE THIS LINE, FUNCTIONS ARE DONE.
-
-
-
-
-
-
-
-    case 'Add a new company role': //ADD PROMPT FOR ROLE title, salary, department_id
-      await addNewRole();
+          await addNewRole(newRoleTitle, newRoleSalary, newRoleDepartmentid)
+        })
+        .then(async () => {
+          return await inquirer.prompt({
+            type: `list`,
+            name: `viewRoles`,
+            message: `View all roles?`,
+            choices: [
+              `Yes`,
+              `No`
+            ]
+          })
+        })
+        .then(async (response) => {
+          if (response.viewRoles === `Yes`) {
+            await viewAllRoles()
+          }
+          return;
+        })
       break;
 
     case 'Add a new company employee': //ADD PROMPT FOR EMPLOYEE first_name, last_name, role_id, manager_id

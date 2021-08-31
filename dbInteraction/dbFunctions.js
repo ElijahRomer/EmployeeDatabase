@@ -14,6 +14,7 @@ const {
 //***********EVERYWHERE THERE IS AN ID PARAMETER, ADD IN AN ID QUERY SO YOU CAN CHANGE IT TO THE NAME, FOR HUMAN READABILITY PURPOSES. */
 
 
+
 //FUNCTIONS
 module.exports = {
   viewAllDepartments: async () => {
@@ -103,6 +104,7 @@ module.exports = {
   },
 
   addNewRole: async (title, salary, departmentId) => {
+
     let sql = `
     INSERT INTO role 
       (title, salary, department_id) 
@@ -114,7 +116,7 @@ module.exports = {
       console.log(`\n\nInsert new role "${title}" successful. ${result.affectedRows} row(s) affected.\n\n`)
 
     } catch (error) {
-      console.error(`\n\nROLE COULD NOT BE ADDED. SEE FOLLOWING ERROR REPORT: \n\n`, error);
+      console.error(`\n\nROLE ${title} COULD NOT BE ADDED. SEE FOLLOWING ERROR REPORT: \n\n`, error);
 
     }
   },
@@ -360,4 +362,18 @@ module.exports = {
       console.error(`\n\nRETRIEVE DEPARTMENTS WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
     }
   },
+  queryDepartmentIdByName: async (departmentName) => {
+    try {
+      let departmentQuery = await database.query(`
+      SELECT id 
+      FROM department
+      WHERE name = ?`, [departmentName]);
+      return departmentQuery[0].id;
+
+    } catch (error) {
+      console.error(`\n\nRETRIEVE DEPARTMENTS WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
+    }
+  }
 };
+
+
