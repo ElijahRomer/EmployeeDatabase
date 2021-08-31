@@ -3,6 +3,11 @@
 const cTable = require(`console.table`);
 const database = require(`../config/connection`);
 const dbPromisify = require("./dbPromisify");
+const {
+  capitalizeFirstLetter,
+  generateInquirerListPrompt,
+  generateInquirerPromptChoicesFromDbQuery
+} = require(`../helpers/helperFunctions`);
 
 //apparently need to use mysql2 rather than mysql-native
 
@@ -10,11 +15,7 @@ const dbPromisify = require("./dbPromisify");
 
 
 //FUNCTIONS
-let dbFunctions = {
-  capitalizeFirstLetter: (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  },
-
+module.exports = {
   viewAllDepartments: async () => {
     let sql = `
     SELECT 
@@ -24,8 +25,8 @@ let dbFunctions = {
       department;`;
 
     try {
-      let result = await database.query(sql)
-      console.log(`\n\nAll departments in database are as follows:\n\n`)
+      let result = await database.query(sql);
+      console.log(`\n\nAll departments in database are as follows:\n\n`);
       console.table(result);
 
     } catch (error) {
@@ -90,9 +91,9 @@ let dbFunctions = {
   addNewDepartment: async (departmentName) => {
     let sql = `INSERT INTO department (name) VALUE (?);`;
     try {
-      let result = await database.query(sql, [this.capitalizeFirstLetter(departmentName)]);
+      let result = await database.query(sql, [capitalizeFirstLetter(departmentName)]);
 
-      console.log(`\n\nInsert new department "${this.capitalizeFirstLetter(departmentName)}" successful. ${result.affectedRows} row(s) affected.\n\n`)
+      console.log(`\n\nInsert new department "${capitalizeFirstLetter(departmentName)}" successful. ${result.affectedRows} row(s) affected.\n\n`)
 
 
     } catch (error) {
@@ -125,8 +126,8 @@ let dbFunctions = {
     VALUE (?, ?, ?, ?);`;
     try {
       let result = await database.query(sql, [
-        this.capitalizeFirstLetter(firstName),
-        this.capitalizeFirstLetter(lastName),
+        capitalizeFirstLetter(firstName),
+        capitalizeFirstLetter(lastName),
         roleId,
         managerId
       ]);
@@ -334,20 +335,29 @@ let dbFunctions = {
     }
   },
 
-  generateListOfManagers: async () => {
+  queryListOfManagers: async () => {
     try {
       let managerQuery = await database.query(`
       SELECT 
         last_name AS LastName
       FROM employee 
       WHERE role_id < 4;`);
-      // console.log(managerQuery);
       return managerQuery;
 
     } catch (error) {
-      console.error(`\n\nVIEW MANAGERS WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
+      console.error(`\n\nRETRIEVE MANAGERS WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
+    }
+  },
+
+  queryListOfDepartments: async () => {
+    try {
+      let departmentQuery = await database.query(`
+      SELECT name 
+      FROM department;`);
+      return departmentQuery;
+
+    } catch (error) {
+      console.error(`\n\nRETRIEVE DEPARTMENTS WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
     }
   },
 };
-
-module.exports = dbFunctions;

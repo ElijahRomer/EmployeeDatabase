@@ -2,12 +2,12 @@ USE employee_db;
 
 INSERT INTO department(name) 
 	VALUES 
-	('Management'),
-    ('Engineering'),
-	('Sales'),
-    ('Customer Service'),
-    ('Technical Support'),
-    ('Human Resources');
+	('Management'), 
+    ('Engineering'), 
+	('Sales'), 
+    ('Customer Service'), 
+    ('Technical Support'), 
+    ('Human Resources'); 
     
 SELECT * FROM department;
 

@@ -2,13 +2,24 @@ require(`dotenv`).config()
 const inquirer = require(`inquirer`);
 const cTable = require(`console.table`);
 const database = require(`./config/connection`);
+
+//helper functions that query db to ensure up-to-date selection prompts
 const {
+  getManagerPrompt,
+  getDepartmentPrompt,
+} = require(`./dbInteraction/dbDynamicPromptFunctions`)
+
+//helper functions that format data from db query for dynamic selection prompts
+const {
+  capitalizeFirstLetter,
   generateInquirerListPrompt,
   generateInquirerPromptChoicesFromDbQuery,
 } = require(`./helpers/helperFunctions`)
 
+
+//functions that query the database for results
 const {
-  capitalizeFirstLetter,
+
   viewAllDepartments,
   viewAllRoles,
   viewAllEmployees,
@@ -23,14 +34,15 @@ const {
   deleteRole,
   deleteEmployee,
   viewDepartmentBudgets,
-  generateListOfManagers,
+  // getManagerPrompt,
+
 } = require(`./dbInteraction/dbFunctions`);
 
-let getManagerPrompt = async () => {
-  let dbquery = await generateListOfManagers()
-  let choices = await generateInquirerPromptChoicesFromDbQuery(dbquery)
-  return generateInquirerListPrompt(choices, 'managerSelection', 'Please choose a manager')
-}
+// let getManagerPrompt = async () => {
+//   let dbquery = await queryListOfManagers()
+//   let choices = await generateInquirerPromptChoicesFromDbQuery(dbquery)
+//   return generateInquirerListPrompt(choices, 'managerSelection', 'Please choose a manager')
+// }
 
 // viewAllDepartments(); //none
 // viewAllRoles();//none
@@ -98,14 +110,17 @@ let nextActionQuestions = [{
 let answerSwitch = async (answer) => {
   switch (answer) {
     case 'View all company departments':
-      await viewAllDepartments();
+      await viewAllDepartments()
       break;
+
     case 'View all company roles':
       await viewAllRoles();
       break;
+
     case 'View all company employees':
       await viewAllEmployees();
       break;
+
     case 'View employees under a specific manager': //
       await getManagerPrompt()
         .then(async (managerPrompt) => {
@@ -114,36 +129,56 @@ let answerSwitch = async (answer) => {
         })
         .then(choice => viewEmployeesByManager(choice));
       break;
+
     case 'View employees in a specific department': //ADD PROMPT FOR DEPARTMENT
-      await viewEmployeesByDepartment();
+      await getDepartmentPrompt()
+        .then(async (departmentPrompt) => {
+          let choice = await inquirer.prompt(departmentPrompt);
+          return choice.departmentSelection;
+        })
+        .then(choice =>
+          viewEmployeesByDepartment(choice)
+        )
+
+      // viewEmployeesByDepartment();
       break;
+
     case 'View all department salary budgets':
       await viewDepartmentBudgets();
       break;
+
     case 'Add a new company department': //ADD PROMPT FOR DEPARTMENT name
       await addNewDepartment();
       break;
+
     case 'Add a new company role': //ADD PROMPT FOR ROLE title, salary, department_id
       await addNewRole();
       break;
+
     case 'Add a new company employee': //ADD PROMPT FOR EMPLOYEE first_name, last_name, role_id, manager_id
       await addNewEmployee();
       break;
+
     case "Update an employee's role": //show list of employees, ask to enter the employee_id, then ask for department transferring to, then query db for roles in department and push to question choices, then prompt if they want to update employee manager. 
       await updateEmployeeRole();
       break;
+
     case "Update an employee's manager": //ADD PROMPT FOR EMPLOYEE manager_id
       await updateEmployeeManager();
       break;
+
     case "Delete a company department": //ADD PROMPT FOR DEPARTMENT name, WARN THAT ALL ROLES AND EMPLOYEES IN THAT DEPARTMENT WILL ALSO BE DELETED.
       await deleteDepartment();
       break;
+
     case "Delete a company role": //ADD PROMPT FOR ROLE title, WARN THAT ALL EMPLOYEES IN THAT ROLE WILL ALSO BE DELETED
       await deleteRole();
       break;
+
     case "Delete a company employee": //ADD PROMPT TO DELETE EMPLOYEE BY ID - view employees and ID's - QUERY FOR ALL ROLES AND NOTIFY USER OF ROLES THAT ARE UNFILLED.
       await deleteEmployee();
       break;
+
     case "Exit employee database":
       exitDatabase();
       return "exit";
