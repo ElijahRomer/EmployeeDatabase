@@ -13,6 +13,8 @@
 * MySql Workbench
 * NodeJS
 * Console.table package
+
+_**View the official Employee Database Walkthrough Video by clicking [HERE](https://www.youtube.com/watch?v=mr9s2TDTW-8) or by pasting the following link in your browser: https://www.youtube.com/watch?v=mr9s2TDTW-8**_
   
 ![Screenshot of app displaying all employees](Assets/Screenshot.jpg "Employee Database displaying all employees")
 
