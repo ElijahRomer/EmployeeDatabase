@@ -270,7 +270,7 @@ module.exports = {
       let sql = `DELETE FROM department WHERE id = ?;`;
       let result = await database.query(sql, [departmentId]);
 
-      console.log(`\n\nDepartment "${departmentName}" successfully deleted.\n\n`)
+      console.log(`\n\nDepartment "${departmentName}" successfully deleted. ${result.affectedRows} row(s) affected.\n\n`)
 
     } catch (error) {
       console.error(`\n\nDELETE DEPARTMENT WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
@@ -292,7 +292,7 @@ module.exports = {
 
       let result = await database.query(sql, [roleId]);
 
-      console.log(`\n\nRole "${roleName}" was successfully deleted.\n\n`)
+      console.log(`\n\nRole "${roleName}" was successfully deleted. ${result.affectedRows} row(s) affected.\n\n`)
 
 
     } catch (error) {
@@ -310,7 +310,7 @@ module.exports = {
         console.log(`\n\n The specified employee does not exist. Please doublecheck the selected ID. \n\n`);
         return;
       }
-      console.log(`\n\nEmployee with ID: ${employeeId} was successfully deleted.\n\n`)
+      console.log(`\n\nEmployee with ID: ${employeeId} was successfully deleted. ${result.affectedRows} row(s) affected.\n\n`)
 
     } catch (error) {
       console.error(`\n\nDELETE EMPLOYEE WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);

@@ -413,7 +413,34 @@ let answerSwitch = async (answer) => {
       break;
 
     case "Delete a company role": //ADD PROMPT FOR ROLE title, WARN THAT ALL EMPLOYEES IN THAT ROLE WILL ALSO BE DELETED
-      await deleteRole();
+      let roleDeletePrompts = [
+        await getRolePrompt(),
+        {
+          type: `list`,
+          name: `confirmDelete`,
+          message: `\n\nWARNING!\n\nDELETING A ROLE WILL ALSO DELETE ALL EMPLOYEES IN THAT ROLE!\n\nAre you sure you wish to proceed?`,
+          default: `No`,
+          choices: [
+            `Yes`,
+            `No`]
+        }
+      ];
+      let roleDeleteResults = await inquirer.prompt(roleDeletePrompts);
+      if (roleDeleteResults.confirmDelete === `Yes`) {
+        await deleteRole(roleDeleteResults.roleSelection);
+      }
+      let viewRolesAfterDelete = await inquirer.prompt({
+        type: `list`,
+        name: `viewRoles`,
+        message: `View all roles?`,
+        choices: [
+          `Yes`,
+          `No`
+        ]
+      })
+      if (await viewRolesAfterDelete.viewRoles === `Yes`) {
+        await viewAllRoles()
+      }
       break;
 
     case "Delete a company employee": //ADD PROMPT TO DELETE EMPLOYEE BY ID - view employees and ID's - QUERY FOR ALL ROLES AND NOTIFY USER OF ROLES THAT ARE UNFILLED.
