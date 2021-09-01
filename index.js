@@ -288,7 +288,7 @@ let answerSwitch = async (answer) => {
         })
       break;
 
-    case "Update an employee's role": //Ask which department the employee is in, select from list of employees, then ask for department transferring to, then query db for roles in department and push to question choices, then prompt if they want to update employee manager. 
+    case "Update an employee's role":
       let updateRolePrompts = [
         {
           type: `input`,
@@ -340,12 +340,76 @@ let answerSwitch = async (answer) => {
       }
       break;
 
+
     case "Update an employee's manager": //ADD PROMPT FOR EMPLOYEE manager_id
-      await updateEmployeeManager();
+      let updateManagerPrompts = [
+        {
+          type: `input`,
+          name: `employeeIdForManagerUpdate`,
+          message: 'Please reference the above and enter the ID of the employee whose manager you want to update.',
+          validate: async (input) => {
+            return new Promise((resolve, reject) => {
+              let parsedInt = parseInt(input)
+              if (Number.isNaN(parsedInt)) {
+                reject('Please enter a valid number.');
+              }
+              resolve(true);
+            })
+          }
+        },
+        await getManagerPrompt()
+      ]
+
+      await viewAllEmployees()
+      let managerUpdateInput = await inquirer.prompt(updateManagerPrompts);
+      let { employeeIdForManagerUpdate, managerSelection } = await managerUpdateInput;
+      let managerId = await queryEmployeeIdByLastName(managerSelection);
+      await updateEmployeeManager(managerId, employeeIdForManagerUpdate);
+
+      let viewEmployeesUpdatedManagerPrompt = await inquirer.prompt(
+        {
+          type: `list`,
+          name: `viewEmployees`,
+          message: `Employee ${employeeIdForManagerUpdate} manager updated to ${managerSelection}. View all employees?`,
+          choices: [
+            `Yes`,
+            `No`]
+        }
+      )
+      if (viewEmployeesUpdatedManagerPrompt.viewEmployees === `Yes`) {
+        await viewAllEmployees()
+      }
       break;
 
-    case "Delete a company department": //ADD PROMPT FOR DEPARTMENT name, WARN THAT ALL ROLES AND EMPLOYEES IN THAT DEPARTMENT WILL ALSO BE DELETED.
-      await deleteDepartment();
+    case "Delete a company department":
+      let departmentDeletePrompts = [
+        await getDepartmentPrompt(),
+        {
+          type: `list`,
+          name: `confirmDelete`,
+          message: `\n\nWARNING!\n\nDELETING A DEPARTMENT WILL ALSO DELETE ALL ROLES AND EMPLOYEES IN THAT DEPARTMENT!\n\nAre you sure you wish to proceed?`,
+          default: `No`,
+          choices: [
+            `Yes`,
+            `No`]
+        }
+      ];
+      let departmentDeleteResults = await inquirer.prompt(departmentDeletePrompts);
+      if (departmentDeleteResults.confirmDelete === `Yes`) {
+        await deleteDepartment(departmentDeleteResults.departmentSelection);
+      }
+      let viewDepartmentsAfterDelete = await inquirer.prompt({
+        type: `list`,
+        name: `viewDepartments`,
+        message: `View departments?`,
+        choices: [
+          `Yes`,
+          `No`
+        ]
+      })
+      if (await viewDepartmentsAfterDelete.viewDepartments === `Yes`) {
+        await viewAllDepartments()
+      }
       break;
 
     case "Delete a company role": //ADD PROMPT FOR ROLE title, WARN THAT ALL EMPLOYEES IN THAT ROLE WILL ALSO BE DELETED
