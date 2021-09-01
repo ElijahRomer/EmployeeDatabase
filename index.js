@@ -444,7 +444,48 @@ let answerSwitch = async (answer) => {
       break;
 
     case "Delete a company employee": //ADD PROMPT TO DELETE EMPLOYEE BY ID - view employees and ID's - QUERY FOR ALL ROLES AND NOTIFY USER OF ROLES THAT ARE UNFILLED.
-      await deleteEmployee();
+      let employeeDeletePrompts = [
+        {
+          type: `input`,
+          name: `employeeIdToDelete`,
+          message: 'Please reference the above and enter the ID of the employee to be deleted.',
+          validate: async (input) => {
+            return new Promise((resolve, reject) => {
+              let parsedInt = parseInt(input)
+              if (Number.isNaN(parsedInt)) {
+                reject('Please enter a valid number.');
+              }
+              resolve(true);
+            })
+          }
+        },
+        {
+          type: `list`,
+          name: `confirmDelete`,
+          message: `\n\nWARNING!\n\nDELETING AN EMPLOYEE MAY LEAVE SOME ROLES UNFILLED AND IS A PERMANENT ACTION! \n\nIF AN EMPLOYEE IS A MANAGER, DELETING THEM WILL ALSO DELETE THEIR DIRECT REPORTS! PLEASE ENSURE EMPLOYEE MANAGERS HAVE BEEN REASSIGNED.\n\nAre you sure you wish to proceed?`,
+          default: `No`,
+          choices: [
+            `Yes`,
+            `No`]
+        }
+      ];
+      await viewAllEmployees();
+      let employeeDeleteResults = await inquirer.prompt(employeeDeletePrompts);
+      if (employeeDeleteResults.confirmDelete === `Yes`) {
+        await deleteEmployee(employeeDeleteResults.employeeIdToDelete);
+      }
+      let viewEmployeesAfterDelete = await inquirer.prompt({
+        type: `list`,
+        name: `viewEmployees`,
+        message: `View all employees?`,
+        choices: [
+          `Yes`,
+          `No`
+        ]
+      })
+      if (await viewEmployeesAfterDelete.viewEmployees === `Yes`) {
+        await viewAllEmployees();
+      }
       break;
 
     case "Exit Company Database":
