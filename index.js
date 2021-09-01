@@ -10,17 +10,8 @@ const {
   getRolePrompt
 } = require(`./dbInteraction/dbDynamicPromptFunctions`)
 
-//helper functions that format data from db query for dynamic selection prompts
-// const {
-//   capitalizeFirstLetter,
-//   generateInquirerListPrompt,
-//   generateInquirerPromptChoicesFromDbQuery,
-// } = require(`./helpers/helperFunctions`)
-
-
-//functions that query the database for results
+//functions that directly handle user dbquery selection and present results
 const {
-
   viewAllDepartments,
   viewAllRoles,
   viewAllEmployees,
@@ -40,30 +31,6 @@ const {
   queryEmployeeIdByLastName,
 } = require(`./dbInteraction/dbFunctions`);
 
-// let getManagerPrompt = async () => {
-//   let dbquery = await queryListOfManagers()
-//   let choices = await generateInquirerPromptChoicesFromDbQuery(dbquery)
-//   return generateInquirerListPrompt(choices, 'managerSelection', 'Please choose a manager')
-// }
-
-// viewAllDepartments(); //none
-// viewAllRoles();//none
-// viewAllEmployees(); //none
-// viewEmployeesByManager(`Badger`); //managerLastName
-// viewEmployeesByDepartment(`Management`); //department
-// viewDepartmentBudgets(); //none
-
-// addNewDepartment(); //departmentName
-// addNewRole(); //title, salary, department_id
-// addNewEmployee(); //first_name, last_name, roleId, managerId
-
-// updateEmployeeRole(`Manager`, 9); //newRole, employeeId - need to update employee manager when this is run
-// updateEmployeeManager();
-
-
-// deleteDepartment();
-// deleteRole();
-// deleteEmployee();
 
 let questions = [
   {
@@ -71,7 +38,6 @@ let questions = [
     name: 'selectAction',
     message: 'What would you like to do?',
     pageSize: 18,
-    // loop: true,
     choices: [
       'View all company departments',
       'View all company roles',
@@ -110,7 +76,7 @@ let nextActionQuestions = [{
 }];
 
 
-
+//MAIN QUERY HANDLER
 let answerSwitch = async (answer) => {
   switch (answer) {
     case 'View all company departments':
@@ -118,14 +84,17 @@ let answerSwitch = async (answer) => {
       break;
 
 
+
     case 'View all company roles':
       await viewAllRoles();
       break;
 
 
+
     case 'View all company employees':
       await viewAllEmployees();
       break;
+
 
 
     case 'View employees under a specific manager':
@@ -136,6 +105,7 @@ let answerSwitch = async (answer) => {
         })
         .then(choice => viewEmployeesByManager(choice));
       break;
+
 
 
     case 'View employees in a specific department':
@@ -150,11 +120,14 @@ let answerSwitch = async (answer) => {
       break;
 
 
+
     case 'View all department salary budgets':
       await viewDepartmentBudgets();
       break;
 
-    case 'Add a new company department': //ADD PROMPT FOR DEPARTMENT name
+
+
+    case 'Add a new company department':
       await inquirer.prompt({
         type: `input`,
         name: `newDepartmentName`,
@@ -181,6 +154,7 @@ let answerSwitch = async (answer) => {
           return;
         })
       break;
+
 
 
     case 'Add a new company role':
@@ -238,6 +212,8 @@ let answerSwitch = async (answer) => {
         })
       break;
 
+
+
     case 'Add a new company employee':
       let addEmployeePrompts = [
         {
@@ -287,6 +263,8 @@ let answerSwitch = async (answer) => {
           return;
         })
       break;
+
+
 
     case "Update an employee's role":
       let updateRolePrompts = [
@@ -341,7 +319,9 @@ let answerSwitch = async (answer) => {
       break;
 
 
-    case "Update an employee's manager": //ADD PROMPT FOR EMPLOYEE manager_id
+
+
+    case "Update an employee's manager":
       let updateManagerPrompts = [
         {
           type: `input`,
@@ -381,6 +361,8 @@ let answerSwitch = async (answer) => {
       }
       break;
 
+
+
     case "Delete a company department":
       let departmentDeletePrompts = [
         await getDepartmentPrompt(),
@@ -412,7 +394,9 @@ let answerSwitch = async (answer) => {
       }
       break;
 
-    case "Delete a company role": //ADD PROMPT FOR ROLE title, WARN THAT ALL EMPLOYEES IN THAT ROLE WILL ALSO BE DELETED
+
+
+    case "Delete a company role":
       let roleDeletePrompts = [
         await getRolePrompt(),
         {
@@ -443,7 +427,7 @@ let answerSwitch = async (answer) => {
       }
       break;
 
-    case "Delete a company employee": //ADD PROMPT TO DELETE EMPLOYEE BY ID - view employees and ID's - QUERY FOR ALL ROLES AND NOTIFY USER OF ROLES THAT ARE UNFILLED.
+    case "Delete a company employee":
       let employeeDeletePrompts = [
         {
           type: `input`,
@@ -488,6 +472,8 @@ let answerSwitch = async (answer) => {
       }
       break;
 
+
+
     case "Exit Company Database":
       exitDatabase();
       return "exit";
@@ -528,25 +514,9 @@ let init = () => {
     })
 }
 
-// let generateInquirerListPrompt = (choices, nameOfAnswer, message) => {
-//   let prompt = {
-//     type: 'list',
-//     name: nameOfAnswer,
-//     message: message,
-//     choices: choices
-//   }
-//   // console.log(prompt)
-//   return prompt;
-// }
-
+//BEGINS PROGRAM
 init();
 
-
-
-
-// getManagerPrompt().then((result) => {
-//   console.log(`\n\nRETURN OF getManagerPrompt IS AS FOLLOWS: \n\n`, result)
-// })
 
 
 
