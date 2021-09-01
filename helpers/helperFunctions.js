@@ -19,7 +19,7 @@ module.exports = {
       type: 'list',
       name: nameOfAnswer,
       message: message,
-      // pageSize: choices.length,
+      pageSize: choices.length,
       choices: choices
     }
     return prompt;

@@ -7,14 +7,15 @@ const database = require(`./config/connection`);
 const {
   getManagerPrompt,
   getDepartmentPrompt,
+  getRolePrompt
 } = require(`./dbInteraction/dbDynamicPromptFunctions`)
 
 //helper functions that format data from db query for dynamic selection prompts
-const {
-  capitalizeFirstLetter,
-  generateInquirerListPrompt,
-  generateInquirerPromptChoicesFromDbQuery,
-} = require(`./helpers/helperFunctions`)
+// const {
+//   capitalizeFirstLetter,
+//   generateInquirerListPrompt,
+//   generateInquirerPromptChoicesFromDbQuery,
+// } = require(`./helpers/helperFunctions`)
 
 
 //functions that query the database for results
@@ -34,8 +35,9 @@ const {
   deleteRole,
   deleteEmployee,
   viewDepartmentBudgets,
-  queryDepartmentIdByName
-
+  queryDepartmentIdByName,
+  queryRoleIdByName,
+  queryEmployeeIdByLastName,
 } = require(`./dbInteraction/dbFunctions`);
 
 // let getManagerPrompt = async () => {
@@ -89,7 +91,7 @@ let questions = [
       "Delete a company role",
       "Delete a company employee",
       new inquirer.Separator(),
-      "Exit employee database",
+      "Exit Company Database",
       new inquirer.Separator()
     ]
   },
@@ -103,9 +105,11 @@ let nextActionQuestions = [{
   choices: [
     `Run a different query or command`,
     `Repeat same query`,
-    `Exit Company database`
+    `Exit Company Database`
   ]
 }];
+
+
 
 let answerSwitch = async (answer) => {
   switch (answer) {
@@ -113,13 +117,16 @@ let answerSwitch = async (answer) => {
       await viewAllDepartments()
       break;
 
+
     case 'View all company roles':
       await viewAllRoles();
       break;
 
+
     case 'View all company employees':
       await viewAllEmployees();
       break;
+
 
     case 'View employees under a specific manager':
       await getManagerPrompt()
@@ -130,6 +137,7 @@ let answerSwitch = async (answer) => {
         .then(choice => viewEmployeesByManager(choice));
       break;
 
+
     case 'View employees in a specific department':
       await getDepartmentPrompt()
         .then(async (departmentPrompt) => {
@@ -138,10 +146,9 @@ let answerSwitch = async (answer) => {
         })
         .then(choice =>
           viewEmployeesByDepartment(choice)
-        )
-
-      // viewEmployeesByDepartment();
+        );
       break;
+
 
     case 'View all department salary budgets':
       await viewDepartmentBudgets();
@@ -175,9 +182,10 @@ let answerSwitch = async (answer) => {
         })
       break;
 
+
     case 'Add a new company role':
       //default prompts for this query line
-      let prompts = [
+      let addRolePrompts = [
         {
           type: `input`,
           name: `newRoleTitle`,
@@ -198,13 +206,12 @@ let answerSwitch = async (answer) => {
           }
         },
       ];
-
-      //generate dynamic department prompt
+      //add dynamic department prompts
       let departmentPrompt = await getDepartmentPrompt()
-      prompts.push(departmentPrompt);
+      addRolePrompts.push(departmentPrompt);
 
       //begin inquirer prompt sequence
-      await inquirer.prompt(prompts)
+      await inquirer.prompt(addRolePrompts)
         .then(async (input) => {
           let newRoleTitle = input.newRoleTitle
           let newRoleSalary = parseInt(input.newRoleSalary)
@@ -231,8 +238,54 @@ let answerSwitch = async (answer) => {
         })
       break;
 
-    case 'Add a new company employee': //ADD PROMPT FOR EMPLOYEE first_name, last_name, role_id, manager_id
-      await addNewEmployee();
+    case 'Add a new company employee':
+      let addEmployeePrompts = [
+        {
+          type: `input`,
+          name: `firstName`,
+          message: 'Please enter the first name of new employee.'
+        },
+        {
+          type: `input`,
+          name: `lastName`,
+          message: 'Please enter the last name of new employee.'
+        },
+      ];
+
+      //generate dynamic prompt sequence
+      let rolePrompt = await getRolePrompt();
+      let managerPrompt = await getManagerPrompt();
+      await managerPrompt.choices.push(`Employee does not have a manager. (SELECT TO LEAVE NULL)`);
+      addEmployeePrompts.push(rolePrompt, managerPrompt)
+
+      //begin inquirer prompt sequence
+      await inquirer.prompt(addEmployeePrompts)
+        .then(async (input) => {
+          let { firstName, lastName, roleSelection, managerSelection } = input;
+          let roleId = await queryRoleIdByName(roleSelection);
+          let managerId = null;
+          if (managerSelection !== `Employee does not have a manager. (SELECT TO LEAVE NULL)`) {
+            managerId = await queryEmployeeIdByLastName(managerSelection);
+          }
+          await addNewEmployee(firstName, lastName, roleId, managerId);
+        })
+        .then(async () => {
+          return await inquirer.prompt({
+            type: `list`,
+            name: `viewEmployees`,
+            message: `View all employees?`,
+            choices: [
+              `Yes`,
+              `No`
+            ]
+          })
+        })
+        .then(async (response) => {
+          if (response.viewEmployees === `Yes`) {
+            await viewAllEmployees()
+          }
+          return;
+        })
       break;
 
     case "Update an employee's role": //show list of employees, ask to enter the employee_id, then ask for department transferring to, then query db for roles in department and push to question choices, then prompt if they want to update employee manager. 
@@ -255,7 +308,7 @@ let answerSwitch = async (answer) => {
       await deleteEmployee();
       break;
 
-    case "Exit employee database":
+    case "Exit Company Database":
       exitDatabase();
       return "exit";
   }
@@ -277,7 +330,7 @@ let nextActionPrompt = async (previousAnswer) => {
       await answerSwitch(previousAnswer);
       await nextActionPrompt(previousAnswer);
       break;
-    case `Exit Employee database`:
+    case `Exit Company Database`:
       exitDatabase();
       return;
   }

@@ -1,5 +1,6 @@
+//helper functions that query db to ensure up-to-date selection prompts
+
 const {
-  capitalizeFirstLetter,
   generateInquirerPromptChoicesFromDbQuery,
   generateInquirerListPrompt
 } = require(`../helpers/helperFunctions`);
@@ -7,6 +8,8 @@ const {
 const {
   queryListOfManagers,
   queryListOfDepartments,
+  queryRoleIdByName,
+  queryListOfRoles
 } = require(`./dbFunctions`)
 
 module.exports = {
@@ -20,5 +23,13 @@ module.exports = {
     let dbquery = await queryListOfDepartments();
     let choices = await generateInquirerPromptChoicesFromDbQuery(dbquery)
     return generateInquirerListPrompt(choices, 'departmentSelection', 'Please choose a department:')
+  },
+
+  getRolePrompt: async function () {
+    let dbquery = await queryListOfRoles();
+    let choices = await generateInquirerPromptChoicesFromDbQuery(dbquery)
+    return generateInquirerListPrompt(choices, 'roleSelection', 'Please choose a role:')
   }
+
+
 };

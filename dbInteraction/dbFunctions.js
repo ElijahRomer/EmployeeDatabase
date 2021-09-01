@@ -362,6 +362,19 @@ module.exports = {
       console.error(`\n\nRETRIEVE DEPARTMENTS WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
     }
   },
+
+  queryListOfRoles: async () => {
+    try {
+      let roleQuery = await database.query(`
+      SELECT title 
+      FROM role;`);
+      return roleQuery;
+
+    } catch (error) {
+      console.error(`\n\nRETRIEVE DEPARTMENTS WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
+    }
+  },
+
   queryDepartmentIdByName: async (departmentName) => {
     try {
       let departmentQuery = await database.query(`
@@ -371,7 +384,33 @@ module.exports = {
       return departmentQuery[0].id;
 
     } catch (error) {
-      console.error(`\n\nRETRIEVE DEPARTMENTS WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
+      console.error(`\n\nRETRIEVE DEPARTMENT ID WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
+    }
+  },
+
+  queryRoleIdByName: async (roleTitle) => {
+    try {
+      let roleQuery = await database.query(`
+      SELECT id 
+      FROM role
+      WHERE title = ?`, [roleTitle]);
+      return roleQuery[0].id;
+
+    } catch (error) {
+      console.error(`\n\nRETRIEVE ROLE ID WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
+    }
+  },
+
+  queryEmployeeIdByLastName: async (lastname) => {
+    try {
+      let roleQuery = await database.query(`
+      SELECT id 
+      FROM employee
+      WHERE last_name = ?`, [lastname]);
+      return roleQuery[0].id;
+
+    } catch (error) {
+      console.error(`\n\nRETRIEVE ROLE ID WAS UNSUCCESSFUL. SEE FOLLOWING ERROR REPORT: \n\n`, error);
     }
   }
 };
