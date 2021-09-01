@@ -33,7 +33,7 @@ _**View the official Employee Database Walkthrough Video by clicking [HERE](http
 To install this application, follow the below steps:
 
 
-1. download the entire directory to a place on your computer in which it can be found.
+1. Download the entire directory to a place on your computer in which it can be found.
 2. Navigate to the application directory in your terminal.
 3. Install dependencies with the following command:
 
@@ -78,7 +78,7 @@ From here, you will be taken to the command selection screen, with available opt
 
 ![Employee Database Main Menu](Assets/mainMenuScreenshot.jpg "Employee Database Main Menu")
 
-Navigation is accomplished via the **up** and **down** arrow keys, and a selection is made by pressing **spacebar**.
+Navigation is accomplished via the **up** and **down** arrow keys, and a selection is made by pressing **enter**.
 
 The commands are divided into four categories, demarcated by dotted lines in the selection prompt:
 
@@ -99,7 +99,7 @@ These selections will return their corresponding data for view by the user. They
 * **View all company employees** - Returns a complete list of all employees and their information, across all roles and departments.
 * **View employees under a specific manager** - Prompts to select an individual from the management department and returns a list of their direct reports.
 * **View employees in a specific department** - Prompts to select a department and returns a list of all employees in that department.
-* **View all department salary budgets** - Returns a list of all departments, and the aggregate sum of each employee in that department. 
+* **View all department salary budgets** - Returns a list of all departments, and the aggregate sum of each employee salary in that department. 
 
 ### Add
 These selections allow a user to add additional data to the database. They *will* mutate the database. They include:
@@ -115,7 +115,7 @@ These selections allow a user to change existing data in the database. They *wil
 * **Update an employee's manager** - Shows list of employees and prompts to enter the employees ID,then select their new manager.
 
 ### Delete
-These selections allow a user to delete existing data from the database. They *will* mutate the database, and carry the biggest potential for error as their deletion effects will cascade. For example, deleting a department will also delete all of it's roles and employees. Deleting a role, will also delete all employees in that role. For this reason, each of these prompts does have a confirmation option before proceeding to prevent accidental loss of data.
+These selections allow a user to delete existing data from the database. They *will* mutate the database, and carry the biggest potential for error as their deletion effects will cascade. For example, deleting a department will also delete all of it's roles and employees. Deleting a role, will also delete all employees in that role. Finally, deleting an employee that is a **Manager** will delete all of their direct reports. For this reason, each of these prompts does have a confirmation option before proceeding to prevent accidental loss of data.
 
 * **Delete a company department** - Prompts to select the department, then confirms to be sure.
 * **Delete a company role** - Prompts to select the role, then confirms to be sure. 
