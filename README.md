@@ -7,6 +7,11 @@
   
   It was also an excellent exercise in understanding asynchronous code in Node.js utilizing both promise and Async/Await syntax, as well as in writing my own libraries of functions and modularizing them for better abstraction, separation of concerns, and achievement of goals in the project.
 
+### Future directions for this project include
+* Adding the ability to back out of a prompt sequence
+* Adding the ability to undo last change
+* Showing a summary of everything that will be deleted in a deletion warning if the deletion will have cascading effects
+
 ### Technologies Used:
 * MySql 2
 * Inquirer
