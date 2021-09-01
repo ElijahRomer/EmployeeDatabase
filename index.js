@@ -288,8 +288,56 @@ let answerSwitch = async (answer) => {
         })
       break;
 
-    case "Update an employee's role": //show list of employees, ask to enter the employee_id, then ask for department transferring to, then query db for roles in department and push to question choices, then prompt if they want to update employee manager. 
-      await updateEmployeeRole();
+    case "Update an employee's role": //Ask which department the employee is in, select from list of employees, then ask for department transferring to, then query db for roles in department and push to question choices, then prompt if they want to update employee manager. 
+      let updateRolePrompts = [
+        {
+          type: `input`,
+          name: `employeeId`,
+          message: 'Please reference the above and enter the ID of the employee whose role you want to update.',
+          validate: async (input) => {
+            return new Promise((resolve, reject) => {
+              let parsedInt = parseInt(input)
+              if (Number.isNaN(parsedInt)) {
+                reject('Please enter a valid number.');
+              }
+              resolve(true);
+            })
+          }
+        },
+        await getRolePrompt()
+      ]
+
+      await viewAllEmployees()
+      let input = await inquirer.prompt(updateRolePrompts);
+      let { employeeId, roleSelection } = await input;
+      await updateEmployeeRole(roleSelection, employeeId);
+      let updateManagerPrompt = await inquirer.prompt(
+        {
+          type: `list`,
+          name: `updateManager`,
+          message: `Update employee manager?`,
+          choices: [
+            `Yes`,
+            `No`
+          ]
+        }
+      )
+      if (await updateManagerPrompt.updateManager === `Yes`) {
+        await answerSwitch("Update an employee's manager")
+      }
+      let viewEmployeesPrompt = await inquirer.prompt(
+        {
+          type: `list`,
+          name: `viewEmployees`,
+          message: `View all employees?`,
+          choices: [
+            `Yes`,
+            `No`]
+        }
+      )
+      if (viewEmployeesPrompt.viewEmployees === `Yes`) {
+        await viewAllEmployees()
+      }
       break;
 
     case "Update an employee's manager": //ADD PROMPT FOR EMPLOYEE manager_id
